@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { CarFront, ChevronUp, ChevronDown, Users, Car, File, Store, Bug, X ,List,UserPlus} from "lucide-react";
-import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
+import { ChevronUp, ChevronDown, Users, CarFront, File, Store, Bug, X ,List, UserPlus } from "lucide-react";
+import { Link } from 'react-router-dom';
 
 export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
   const [isUsersMenuOpen, setIsUsersMenuOpen] = useState(false);
-  const [isInventoryMenuOpen, setIsInventoryMenuOpen] = useState(false);
+  const [isInventoryMenuOpen, setIsInventoryMenuOpen] = useState(false); // Estado para abrir/cerrar el menú de autos
   const [isQrMenuOpen, setIsQrMenuOpen] = useState(false);
   const [isRackMenuOpen, setIsRackMenuOpen] = useState(false);
   const [isTiendaMenuOpen, setIsTiendaMenuOpen] = useState(false);
   const [isBugsMenuOpen, setIsBugsMenuOpen] = useState(false);
-  const [isDuenosMenuOpen, setIsDuenosMenuOpen] = useState(false); // Nuevo estado para el menú de dueños
+  const [isDuenosMenuOpen, setIsDuenosMenuOpen] = useState(false);
 
   const toggleUsersMenu = () => setIsUsersMenuOpen(!isUsersMenuOpen);
-  const toggleInventoryMenu = () => setIsInventoryMenuOpen(!isInventoryMenuOpen);
+  const toggleInventoryMenu = () => setIsInventoryMenuOpen(!isInventoryMenuOpen); // Alterna el menú de autos
   const toggleQrMenu = () => setIsQrMenuOpen(!isQrMenuOpen);
   const toggleRackMenu = () => setIsRackMenuOpen(!isRackMenuOpen);
   const toggleTiendaMenu = () => setIsTiendaMenuOpen(!isTiendaMenuOpen);
   const toggleBugsMenu = () => setIsBugsMenuOpen(!isBugsMenuOpen);
-  const toggleDuenosMenu = () => setIsDuenosMenuOpen(!isDuenosMenuOpen); // Función para abrir/cerrar el submenú de dueños
+  const toggleDuenosMenu = () => setIsDuenosMenuOpen(!isDuenosMenuOpen);
 
   return (
     <aside
@@ -27,7 +27,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <Car className="h-6 w-6 text-primary mr-2" />
+          <img src="/logo.png" alt="Logo" className="h-6 w-6 mr-2" />
           <span className="text-xl font-bold">CarMotorFix</span> 
         </div>
         <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleSidebar}>
@@ -36,26 +36,33 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
       </div>
 
       <nav className="space-y-2 overflow-y-auto">
-        {/* Inventario */}
+        {/* Sección de Inventario (Autos) */}
         <div>
           <Button
             variant="ghost"
             className="w-full justify-start flex items-center"
             onClick={toggleInventoryMenu}
           >
-            <CarFront className="mr-2 h-4 w-4" /> Auto
+            <CarFront className="mr-2 h-4 w-4" /> Autos
             {isInventoryMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
           </Button>
           {isInventoryMenuOpen && (
             <div className="pl-6 mt-2 space-y-1">
-              <Button variant="ghost" className="w-full justify-start">Crear auto</Button>
-              <Button variant="ghost" className="w-full justify-start">Ver auto</Button>
-              <Button variant="ghost" className="w-full justify-start">Modificar auto</Button>
+              {/* Mis Autos */}
+              <Link to="/mis-autos" className="w-full block">
+                {/* Cambiado: ahora está centrado con justify-center */}
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center bg-gray-100 hover:bg-gray-200 focus:bg-gray-300 active:bg-gray-300 text-center"
+                >
+                  Mis Autos
+                </Button>
+              </Link>
             </div>
           )}
         </div>
 
-        {/* mecanico */}
+        {/* Otras secciones del sidebar... */}
         <div>
           <Button
             variant="ghost"
@@ -74,7 +81,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           )}
         </div>
 
-        {/* ORden */}
+        {/* Sección para Ordenes */}
         <div>
           <Button
             variant="ghost"
@@ -93,14 +100,14 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           )}
         </div>
 
-        {/* Servicio */}
+        {/* Sección para Servicios */}
         <div>
           <Button
             variant="ghost"
             className="w-full justify-start flex items-center"
             onClick={toggleRackMenu}
           >
-            <List className="mr-2 h-4 w-4" /> servicio
+            <List className="mr-2 h-4 w-4" /> Servicio
             {isRackMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
           </Button>
           {isRackMenuOpen && (
@@ -112,7 +119,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           )}
         </div>
 
-        {/* Taller */}
+        {/* Sección para el Taller */}
         <div>
           <Button
             variant="ghost"
@@ -135,7 +142,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           )}
         </div>
 
-        {/* Bugs */}
+        {/* Sección para Bugs */}
         <div>
           <Button
             variant="ghost"
@@ -153,7 +160,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           )}
         </div>
 
-        {/* Dueños */}
+        {/* Sección para Administradores */}
         <div>
           <Button
             variant="ghost"
@@ -166,7 +173,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           {isDuenosMenuOpen && (
             <div className="pl-6 mt-2 space-y-1">
               <Link to="/crear-dueño" className="w-full block">
-              <Button variant="ghost" className="w-full justify-start">Crear admin</Button>
+                <Button variant="ghost" className="w-full justify-start">Crear admin</Button>
               </Link>
               <Button variant="ghost" className="w-full justify-start">Ver admin</Button>
               <Button variant="ghost" className="w-full justify-start">Modificar admin</Button>
