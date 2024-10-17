@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import { ChevronUp, ChevronDown, Users, CarFront, File, Store, Bug, X ,List, UserPlus } from "lucide-react";
+import { ChevronUp, ChevronDown, Users, CarFront, File, Store, Bug, X, List, UserPlus } from "lucide-react";
 import { Link } from 'react-router-dom';
 
 export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
   const [isUsersMenuOpen, setIsUsersMenuOpen] = useState(false);
-  const [isInventoryMenuOpen, setIsInventoryMenuOpen] = useState(false); // Estado para abrir/cerrar el menú de autos
+  const [isInventoryMenuOpen, setIsInventoryMenuOpen] = useState(false);
   const [isQrMenuOpen, setIsQrMenuOpen] = useState(false);
   const [isRackMenuOpen, setIsRackMenuOpen] = useState(false);
-  const [isTiendaMenuOpen, setIsTiendaMenuOpen] = useState(false);
+  const [isTallerMenuOpen, setIsTallerMenuOpen] = useState(false); // Nuevo estado para el menú de Taller
   const [isBugsMenuOpen, setIsBugsMenuOpen] = useState(false);
   const [isDuenosMenuOpen, setIsDuenosMenuOpen] = useState(false);
 
   const toggleUsersMenu = () => setIsUsersMenuOpen(!isUsersMenuOpen);
-  const toggleInventoryMenu = () => setIsInventoryMenuOpen(!isInventoryMenuOpen); // Alterna el menú de autos
+  const toggleInventoryMenu = () => setIsInventoryMenuOpen(!isInventoryMenuOpen);
   const toggleQrMenu = () => setIsQrMenuOpen(!isQrMenuOpen);
   const toggleRackMenu = () => setIsRackMenuOpen(!isRackMenuOpen);
-  const toggleTiendaMenu = () => setIsTiendaMenuOpen(!isTiendaMenuOpen);
+  const toggleTallerMenu = () => setIsTallerMenuOpen(!isTallerMenuOpen); // Alternar el menú de Taller
   const toggleBugsMenu = () => setIsBugsMenuOpen(!isBugsMenuOpen);
   const toggleDuenosMenu = () => setIsDuenosMenuOpen(!isDuenosMenuOpen);
 
@@ -28,7 +28,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <img src="/logo.png" alt="Logo" className="h-6 w-6 mr-2" />
-          <span className="text-xl font-bold">CarMotorFix</span> 
+          <span className="text-xl font-bold">CarMotorFix</span>
         </div>
         <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleSidebar}>
           <X className="h-6 w-6" />
@@ -48,9 +48,7 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           </Button>
           {isInventoryMenuOpen && (
             <div className="pl-6 mt-2 space-y-1">
-              {/* Mis Autos */}
               <Link to="/mis-autos" className="w-full block">
-                {/* Cambiado: ahora está centrado con justify-center */}
                 <Button
                   variant="ghost"
                   className="w-full justify-center bg-gray-100 hover:bg-gray-200 focus:bg-gray-300 active:bg-gray-300 text-center"
@@ -62,7 +60,25 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
           )}
         </div>
 
-        {/* Otras secciones del sidebar... */}
+        {/* Sección para el Taller */}
+        <div>
+          <Button
+            variant="ghost"
+            className="w-full justify-start flex items-center"
+            onClick={toggleTallerMenu} // Toggle para la sección Taller
+          >
+            <Store className="mr-2 h-4 w-4" /> Taller
+            {isTallerMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
+          </Button>
+          {isTallerMenuOpen && (
+            <div className="pl-6 mt-2 space-y-1">
+              <Link to="/ver-taller" className="w-full block">
+                <Button variant="ghost" className="w-full justify-start">Ver Talleres</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+
         <div>
           <Button
             variant="ghost"
@@ -115,29 +131,6 @@ export default function DashboardSidebar({ sidebarOpen, toggleSidebar }) {
               <Button variant="ghost" className="w-full justify-start">Crear Servicio</Button>
               <Button variant="ghost" className="w-full justify-start">Modificar Servicio</Button>
               <Button variant="ghost" className="w-full justify-start">Ver Servicio</Button>
-            </div>
-          )}
-        </div>
-
-        {/* Sección para el Taller */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center"
-            onClick={toggleTiendaMenu}
-          >
-            <Store className="mr-2 h-4 w-4" /> Taller
-            {isTiendaMenuOpen ? <ChevronUp className="ml-auto h-4 w-4" /> : <ChevronDown className="ml-auto h-4 w-4" />}
-          </Button>
-          {isTiendaMenuOpen && (
-            <div className="pl-6 mt-2 space-y-1">
-              <Link to="/crear-tienda" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Crear Taller</Button>
-              </Link>
-              <Link to="/ver-tienda" className="w-full block">
-                <Button variant="ghost" className="w-full justify-start">Ver Taller</Button>
-              </Link>
-              <Button variant="ghost" className="w-full justify-start">Modificar Taller</Button>
             </div>
           )}
         </div>

@@ -178,7 +178,7 @@ export default function Dashboard() {
               {/* Botón de crear */}
               <div className="mb-4">
                 <Button type="submit" className="w-full bg-blue-500 text-white" disabled={loading}>
-                  {loading ? "Creando tienda..." : "Crear Tienda"}
+                  {loading ? "Creando Taller..." : "Crear Taller"}
                 </Button>
               </div>
             </form>

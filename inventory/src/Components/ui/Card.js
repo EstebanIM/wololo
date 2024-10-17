@@ -1,10 +1,10 @@
 import React from "react";
-import clsx from "clsx"; // Si necesitas manejar variantes más adelante
+import clsx from "clsx"; 
 
 export const Card = ({ className, variant = "default", children }) => {
   const variantStyles = clsx({
-    "bg-gray-800 text-white": variant === "default",
-    "bg-white text-gray-900": variant === "light",
+    "bg-[#1E3A8A] text-white": variant === "default", // Azul oscuro
+    "bg-white text-gray-900": variant === "light", 
   });
 
   return (
@@ -15,11 +15,11 @@ export const Card = ({ className, variant = "default", children }) => {
 };
 
 export const CardHeader = ({ className, children }) => (
-  <div className={clsx("p-4 bg-gray-800", className)}>{children}</div>
+  <div className={clsx("p-4 bg-[#1C357A]", className)}>{children}</div> // Azul más oscuro para el encabezado
 );
 
 export const CardContent = ({ className, children }) => (
-  <div className={clsx("p-4", className)}>{children}</div>
+  <div className={clsx("p-4 bg-[#1E3A8A]", className)}>{children}</div>
 );
 
 export const CardTitle = ({ className, children }) => (
