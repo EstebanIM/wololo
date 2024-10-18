@@ -190,13 +190,13 @@ export default function Register() {
                                 />
                             </div>
 
-                            <Button className="w-full" type="submit" disabled={loading}>
+                            <Button className="w-full bg-yellow-500 hover:bg-yellow-600" type="submit" disabled={loading}>
                                 {loading ? "Registrando..." : "Registrarse"}
                             </Button>
                         </div>
                     </form>
 
-                    <div className="mt-4 text-center text-sm text-gray-500">
+                    <div className="mt-4 text-center text-sm text-gray-300">
                         <span>¿Ya tienes una cuenta? </span>
                         <Link to="/login" className="text-yellow-500 hover:underline">
                             Inicia Sesión

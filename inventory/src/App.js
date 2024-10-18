@@ -50,6 +50,16 @@ function App() {
             }
           />
 
+          {/* Ruta pública: Página de login */}
+          <Route
+            path="/login"
+            element={
+              <RedirectIfLoggedIn>
+                <Login /> {/* Muestra el formulario de Registro solo si no está autenticado */}
+              </RedirectIfLoggedIn>
+            }
+          />
+
           {/* Ruta pública: Confirmación de Registro */}
           <Route
             path="/confirm-register"
