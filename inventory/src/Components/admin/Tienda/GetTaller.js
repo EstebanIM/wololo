@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../../libs/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import DashboardHeader from "../../menu/DashboardHeader";
 import DashboardSidebar from "../../menu/DashboardSidebar";
 import { Card, CardHeader, CardTitle, CardContent } from "../../ui/Card";
@@ -18,7 +25,7 @@ export default function VerTalleres() {
     nombreTienda: "",
     direccion: "",
     region: "",
-    comuna: ""
+    comuna: "",
   });
   const [editingTaller, setEditingTaller] = useState(null); // Para manejar el estado de edición
 
@@ -27,7 +34,10 @@ export default function VerTalleres() {
   const fetchTalleres = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "tiendas"));
-      const talleresData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const talleresData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setTalleres(talleresData);
       setLoading(false);
     } catch (err) {
@@ -45,18 +55,23 @@ export default function VerTalleres() {
     setNewTaller((prev) => ({ ...prev, [name]: value }));
   };
 
-  const filteredComunas = comunasRegiones.regiones.find(
-    (r) => r.region === newTaller.region
-  )?.comunas || [];
+  const filteredComunas =
+    comunasRegiones.regiones.find((r) => r.region === newTaller.region)
+      ?.comunas || [];
 
   const handleAddOrEditTaller = async (e) => {
-    e.preventDefault();  // Evita cualquier comportamiento predeterminado como redirecciones
-  
-    if (!newTaller.nombreTienda || !newTaller.direccion || !newTaller.region || !newTaller.comuna) {
+    e.preventDefault(); // Evita cualquier comportamiento predeterminado como redirecciones
+
+    if (
+      !newTaller.nombreTienda ||
+      !newTaller.direccion ||
+      !newTaller.region ||
+      !newTaller.comuna
+    ) {
       Swal.fire("Error", "Todos los campos son obligatorios", "error");
       return;
     }
-  
+
     try {
       if (editingTaller) {
         // Editar taller existente
@@ -67,20 +82,18 @@ export default function VerTalleres() {
         await addDoc(collection(db, "tiendas"), newTaller);
         Swal.fire("Agregado", "Taller agregado correctamente", "success");
       }
-  
+
       // Reinicia el formulario y el estado después de guardar
       setShowModal(false);
       setNewTaller({ nombreTienda: "", direccion: "", region: "", comuna: "" });
       setEditingTaller(null);
-  
+
       // Refresca la lista de talleres
       fetchTalleres();
-  
     } catch (error) {
       Swal.fire("Error", "No se pudo guardar el taller", "error");
     }
   };
-  
 
   const handleEditTaller = (taller) => {
     setNewTaller(taller);
@@ -90,12 +103,12 @@ export default function VerTalleres() {
 
   const handleDeleteTaller = async (tallerId) => {
     const result = await Swal.fire({
-      title: '¿Estás seguro?',
+      title: "¿Estás seguro?",
       text: "Esta acción no se puede deshacer",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminarlo',
-      cancelButtonText: 'Cancelar'
+      confirmButtonText: "Sí, eliminarlo",
+      cancelButtonText: "Cancelar",
     });
 
     if (result.isConfirmed) {
@@ -111,7 +124,10 @@ export default function VerTalleres() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
-      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <DashboardSidebar
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={toggleSidebar}
+      />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <DashboardHeader toggleSidebar={toggleSidebar} />
@@ -127,12 +143,20 @@ export default function VerTalleres() {
               {talleres.map((taller) => (
                 <Card key={taller.id} className="bg-gray-100 shadow-lg">
                   <CardHeader className="p-4">
-                    <CardTitle className="text-xl font-bold">{taller.nombreTienda}</CardTitle>
+                    <CardTitle className="text-xl font-bold">
+                      {taller.nombreTienda}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="p-4">
-                    <p><strong>Dirección:</strong> {taller.direccion}</p>
-                    <p><strong>Ciudad:</strong> {taller.comuna}</p>
-                    <p><strong>Región:</strong> {taller.region}</p>
+                    <p>
+                      <strong>Dirección:</strong> {taller.direccion}
+                    </p>
+                    <p>
+                      <strong>Ciudad:</strong> {taller.comuna}
+                    </p>
+                    <p>
+                      <strong>Región:</strong> {taller.region}
+                    </p>
                     <div className="mt-4 flex space-x-2">
                       <Button
                         variant="default"
@@ -142,8 +166,9 @@ export default function VerTalleres() {
                         Modificar
                       </Button>
                       <Button
-                        variant="danger"
+                        variant="warning"
                         size="sm"
+                        className="bg-[#F59E0B] hover:bg-[#D97706] text-white"
                         onClick={() => handleDeleteTaller(taller.id)}
                       >
                         Eliminar
@@ -164,7 +189,12 @@ export default function VerTalleres() {
                 variant="default"
                 size="md"
                 onClick={() => {
-                  setNewTaller({ nombreTienda: "", direccion: "", region: "", comuna: "" });
+                  setNewTaller({
+                    nombreTienda: "",
+                    direccion: "",
+                    region: "",
+                    comuna: "",
+                  });
                   setShowModal(true);
                 }}
               >
@@ -185,7 +215,9 @@ export default function VerTalleres() {
             >
               &times;
             </button>
-            <h2 className="text-xl font-bold mb-4">{editingTaller ? "Modificar Taller" : "Agregar Nuevo Taller"}</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {editingTaller ? "Modificar Taller" : "Agregar Nuevo Taller"}
+            </h2>
             <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-gray-700">Nombre del Taller</label>
@@ -230,7 +262,7 @@ export default function VerTalleres() {
                   value={newTaller.comuna}
                   onChange={handleInputChange}
                   className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                  >
+                >
                   <option value="">Selecciona una comuna</option>
                   {filteredComunas.map((comuna) => (
                     <option key={comuna} value={comuna}>
@@ -256,4 +288,3 @@ export default function VerTalleres() {
     </div>
   );
 }
-
