@@ -1,96 +1,128 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../../../libs/firebase"; // Importar Firestore
-import { collection, getDocs, addDoc, updateDoc, doc } from "firebase/firestore"; // Para interactuar con Firestore
-import DashboardHeader from "../../menu/DashboardHeader"; // Importar el header del dashboard
-import DashboardSidebar from "../../menu/DashboardSidebar"; // Importar el sidebar del dashboard
-import { Card, CardHeader, CardTitle, CardContent } from "../../ui/Card"; // Componente de tarjetas
-import { Button } from "../../ui/button"; // Componente de botón
-import { Form } from "../../ui/Form"; // Formulario para crear y modificar
+import { db } from "../../../libs/firebase";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import DashboardHeader from "../../menu/DashboardHeader";
+import DashboardSidebar from "../../menu/DashboardSidebar";
+import { Card, CardHeader, CardTitle, CardContent } from "../../ui/Card";
+import { Button } from "../../ui/button"; // Importar tu componente Button
+import comunasRegiones from "../../../data/comunas-regiones.json";
+import Swal from "sweetalert2"; // Para alertas
 
 export default function VerTalleres() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [talleres, setTalleres] = useState([]); // Estado para almacenar los talleres
-  const [loading, setLoading] = useState(true); // Para manejar el estado de carga
-  const [error, setError] = useState(null); // Estado para manejar errores
-  const [showFormModal, setShowFormModal] = useState(false); // Modal para el formulario
-  const [currentTaller, setCurrentTaller] = useState({ nombreTienda: "", direccion: "", ciudad: "", region: "" }); // Estado para el taller actual
-  const [editingTaller, setEditingTaller] = useState(false); // Estado para saber si estamos editando
+  const [talleres, setTalleres] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newTaller, setNewTaller] = useState({
+    nombreTienda: "",
+    direccion: "",
+    region: "",
+    comuna: ""
+  });
+  const [editingTaller, setEditingTaller] = useState(null); // Para manejar el estado de edición
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  // Función para obtener los talleres de Firestore
   const fetchTalleres = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, "tiendas")); // Obtener los talleres desde Firestore
-      const talleresData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); // Mapeo de los datos
-      setTalleres(talleresData); // Actualizar el estado con los talleres obtenidos
-      setLoading(false); // Detener el estado de carga
+      const querySnapshot = await getDocs(collection(db, "tiendas"));
+      const talleresData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setTalleres(talleresData);
+      setLoading(false);
     } catch (err) {
-      setError("Error al obtener los talleres: " + err.message); // Manejar errores
+      setError("Error al obtener los talleres: " + err.message);
       setLoading(false);
     }
   };
 
-  // Efecto para cargar los talleres cuando el componente se monta
   useEffect(() => {
     fetchTalleres();
   }, []);
 
-  // Función para abrir el formulario
-  const handleShowForm = (taller = null) => {
-    if (taller) {
-      setCurrentTaller(taller); // Rellenar el formulario con los datos del taller a modificar
-      setEditingTaller(true);
-    } else {
-      setCurrentTaller({ nombreTienda: "", direccion: "", ciudad: "", region: "" }); // Limpiar el formulario para agregar uno nuevo
-      setEditingTaller(false);
-    }
-    setShowFormModal(true); // Mostrar el modal
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewTaller((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Función para manejar la creación o modificación de un taller
-  const handleSaveTaller = async (e) => {
-    e.preventDefault();
+  const filteredComunas = comunasRegiones.regiones.find(
+    (r) => r.region === newTaller.region
+  )?.comunas || [];
+
+  const handleAddOrEditTaller = async (e) => {
+    e.preventDefault();  // Evita cualquier comportamiento predeterminado como redirecciones
+  
+    if (!newTaller.nombreTienda || !newTaller.direccion || !newTaller.region || !newTaller.comuna) {
+      Swal.fire("Error", "Todos los campos son obligatorios", "error");
+      return;
+    }
+  
     try {
       if (editingTaller) {
-        // Modificar el taller existente
-        const tallerRef = doc(db, "tiendas", currentTaller.id);
-        await updateDoc(tallerRef, currentTaller);
+        // Editar taller existente
+        await updateDoc(doc(db, "tiendas", editingTaller.id), newTaller);
+        Swal.fire("Actualizado", "Taller modificado correctamente", "success");
       } else {
-        // Agregar un nuevo taller
-        await addDoc(collection(db, "tiendas"), currentTaller);
+        // Agregar nuevo taller
+        await addDoc(collection(db, "tiendas"), newTaller);
+        Swal.fire("Agregado", "Taller agregado correctamente", "success");
       }
-      fetchTalleres(); // Recargar los talleres
-      setShowFormModal(false); // Cerrar el modal
+  
+      // Reinicia el formulario y el estado después de guardar
+      setShowModal(false);
+      setNewTaller({ nombreTienda: "", direccion: "", region: "", comuna: "" });
+      setEditingTaller(null);
+  
+      // Refresca la lista de talleres
+      fetchTalleres();
+  
     } catch (error) {
-      console.error("Error al guardar el taller: ", error);
+      Swal.fire("Error", "No se pudo guardar el taller", "error");
+    }
+  };
+  
+
+  const handleEditTaller = (taller) => {
+    setNewTaller(taller);
+    setEditingTaller(taller);
+    setShowModal(true);
+  };
+
+  const handleDeleteTaller = async (tallerId) => {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción no se puede deshacer",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminarlo',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteDoc(doc(db, "tiendas", tallerId));
+        Swal.fire("Eliminado", "Taller eliminado correctamente", "success");
+        fetchTalleres();
+      } catch (error) {
+        Swal.fire("Error", "No se pudo eliminar el taller", "error");
+      }
     }
   };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
-      {/* Sidebar */}
       <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <DashboardHeader toggleSidebar={toggleSidebar} />
 
-        {/* Contenido Principal - Lista de Talleres */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
           <div className="max-w-7xl mx-auto p-4 bg-white shadow-md rounded-lg">
             <h1 className="text-2xl font-bold mb-6">Talleres Creados</h1>
 
-            {/* Botón para agregar taller */}
-            <Button variant="default" onClick={() => handleShowForm(null)}>
-              Agregar Taller
-            </Button>
-
-            {/* Mostrar mensaje de carga o error */}
             {loading && <div>Cargando talleres...</div>}
             {error && <div className="text-red-500 mb-4">{error}</div>}
 
-            {/* Mostrar talleres en tarjetas */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {talleres.map((taller) => (
                 <Card key={taller.id} className="bg-gray-100 shadow-lg">
@@ -99,77 +131,129 @@ export default function VerTalleres() {
                   </CardHeader>
                   <CardContent className="p-4">
                     <p><strong>Dirección:</strong> {taller.direccion}</p>
-                    <p><strong>Ciudad:</strong> {taller.ciudad}</p>
+                    <p><strong>Ciudad:</strong> {taller.comuna}</p>
                     <p><strong>Región:</strong> {taller.region}</p>
-                    <Button variant="default" onClick={() => handleShowForm(taller)}>
-                      Modificar
-                    </Button>
+                    <div className="mt-4 flex space-x-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleEditTaller(taller)}
+                      >
+                        Modificar
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDeleteTaller(taller.id)}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
 
-            {/* Mensaje si no hay talleres */}
             {!loading && talleres.length === 0 && (
               <div className="text-gray-500">No hay talleres creados.</div>
             )}
+
+            {/* Botón para abrir el modal de agregar/modificar taller */}
+            <div className="mt-6">
+              <Button
+                variant="default"
+                size="md"
+                onClick={() => {
+                  setNewTaller({ nombreTienda: "", direccion: "", region: "", comuna: "" });
+                  setShowModal(true);
+                }}
+              >
+                Agregar Taller
+              </Button>
+            </div>
           </div>
         </main>
       </div>
 
-      {/* Modal del formulario */}
-      {showFormModal && (
-        <Form show={showFormModal} onClose={() => setShowFormModal(false)}>
-          <h2 className="text-xl font-bold mb-4">{editingTaller ? "Modificar Taller" : "Agregar Nuevo Taller"}</h2>
-          <form onSubmit={handleSaveTaller}>
-            <div className="mb-4">
-              <label className="block text-gray-700">Nombre del Taller</label>
-              <input
-                type="text"
-                value={currentTaller.nombreTienda}
-                onChange={(e) => setCurrentTaller({ ...currentTaller, nombreTienda: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Dirección</label>
-              <input
-                type="text"
-                value={currentTaller.direccion}
-                onChange={(e) => setCurrentTaller({ ...currentTaller, direccion: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Ciudad</label>
-              <input
-                type="text"
-                value={currentTaller.ciudad}
-                onChange={(e) => setCurrentTaller({ ...currentTaller, ciudad: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Región</label>
-              <input
-                type="text"
-                value={currentTaller.region}
-                onChange={(e) => setCurrentTaller({ ...currentTaller, region: e.target.value })}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div className="flex justify-between">
-              <Button type="submit" className="bg-blue-500 text-white">
-                {editingTaller ? "Guardar Cambios" : "Agregar Taller"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+      {/* Modal para agregar/modificar taller */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-1/3 p-6 relative">
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+            >
+              &times;
+            </button>
+            <h2 className="text-xl font-bold mb-4">{editingTaller ? "Modificar Taller" : "Agregar Nuevo Taller"}</h2>
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700">Nombre del Taller</label>
+                <input
+                  type="text"
+                  name="nombreTienda"
+                  value={newTaller.nombreTienda}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Dirección</label>
+                <input
+                  type="text"
+                  name="direccion"
+                  value={newTaller.direccion}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700">Región</label>
+                <select
+                  name="region"
+                  value={newTaller.region}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                >
+                  <option value="">Selecciona una región</option>
+                  {comunasRegiones.regiones.map((region) => (
+                    <option key={region.region} value={region.region}>
+                      {region.region}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-700">Comuna</label>
+                <select
+                  name="comuna"
+                  value={newTaller.comuna}
+                  onChange={handleInputChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                  >
+                  <option value="">Selecciona una comuna</option>
+                  {filteredComunas.map((comuna) => (
+                    <option key={comuna} value={comuna}>
+                      {comuna}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-span-2 mt-4 flex justify-end">
+                <Button
+                  variant="default"
+                  size="md"
+                  onClick={handleAddOrEditTaller}
+                >
+                  {editingTaller ? "Guardar Cambios" : "Agregar Taller"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
 }
+

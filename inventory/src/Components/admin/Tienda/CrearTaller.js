@@ -81,7 +81,7 @@ export default function Dashboard() {
           <div className="max-w-lg mx-auto p-4 bg-white shadow-md rounded-lg">
             <h1 className="text-2xl font-bold mb-6">Crear Taller</h1>
             {error && <div className="text-red-500 mb-4">{error}</div>}
-            {success && <div className="text-green-500 mb-4">Taller creada exitosamente</div>}
+            {success && <div className="text-green-500 mb-4">Taller creado exitosamente</div>}
             
             <form onSubmit={handleSubmit}>
               {/* Nombre de la tienda */}

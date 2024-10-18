@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 export const Card = ({ className, variant = "default", children }) => {
   const variantStyles = clsx({
-    "bg-[#1E3A8A] text-white": variant === "default", // Azul oscuro
+    "bg-[#1F2937] text-white": variant === "default", // Gris oscuro
     "bg-white text-gray-900": variant === "light", 
   });
 
@@ -15,11 +15,11 @@ export const Card = ({ className, variant = "default", children }) => {
 };
 
 export const CardHeader = ({ className, children }) => (
-  <div className={clsx("p-4 bg-[#1C357A]", className)}>{children}</div> // Azul más oscuro para el encabezado
+  <div className={clsx("p-4 bg-[#111827]", className)}>{children}</div> // Gris más oscuro para el encabezado
 );
 
 export const CardContent = ({ className, children }) => (
-  <div className={clsx("p-4 bg-[#1E3A8A]", className)}>{children}</div>
+  <div className={clsx("p-4", className)}>{children}</div> // Manteniendo el contenido en gris oscuro
 );
 
 export const CardTitle = ({ className, children }) => (
