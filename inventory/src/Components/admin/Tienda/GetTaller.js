@@ -207,8 +207,8 @@ export default function VerTalleres() {
 
       {/* Modal para agregar/modificar taller */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-1/3 p-6 relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative md:w-1/2 lg:w-1/3">
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
@@ -285,6 +285,7 @@ export default function VerTalleres() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

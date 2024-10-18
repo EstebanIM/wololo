@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Bell, Menu, User, Settings, LogOut } from "lucide-react";
 import { useAuth } from '../../Context/Authcontext'; // Hook de autenticación para cerrar sesión
+import { db } from '../../libs/firebase'; // Suponiendo que tienes configurado Firestore
+import { doc, getDoc } from "firebase/firestore"; // Métodos para interactuar con Firestore
 
 export default function DashboardHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { logout } = useAuth(); // Usar el hook de autenticación
+  const [userName, setUserName] = useState(null); // Estado para almacenar el nombre del usuario
+  const { currentUser, logout } = useAuth(); // Obtén el usuario actual y la función de logout desde el contexto de Auth
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
@@ -16,6 +19,27 @@ export default function DashboardHeader({ toggleSidebar }) {
       console.error('Error al cerrar sesión:', error);
     }
   };
+
+  // Efecto para obtener el nombre del usuario desde Firestore
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (currentUser) {
+        try {
+          const userRef = doc(db, 'admins', currentUser.uid); // Accede al documento del usuario autenticado
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            setUserName(userSnap.data().primNom); // Asigna el nombre al estado
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [currentUser]); // Ejecutar el efecto cuando currentUser cambie
 
   return (
     <header className="bg-white shadow-sm z-10">
@@ -38,7 +62,10 @@ export default function DashboardHeader({ toggleSidebar }) {
             </Button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-20">
-                <div className="px-4 py-2 text-sm font-medium text-gray-700">Mi Cuenta</div>
+                {/* Muestra el nombre del usuario */}
+                <div className="px-4 py-2 text-sm font-medium text-gray-700">
+                  {userName ? `Hola, ${userName}` : "Cargando..."}
+                </div>
                 <div className="border-t border-gray-200"></div>
                 <div
                   className="px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"

@@ -10,12 +10,16 @@ import {
     updateDoc,
     deleteDoc,
     doc,
+    query,
+    where
 } from "firebase/firestore";
+import { useAuth } from "../../Context/Authcontext"; // Importa el contexto de autenticación
 import DashboardHeader from "../menu/DashboardHeader";
 import DashboardSidebar from "../menu/DashboardSidebar";
 import Swal from "sweetalert2";
 
 export default function Dashboard() {
+    const { currentUser } = useAuth(); // Obtener el usuario autenticado
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Autos
@@ -48,28 +52,34 @@ export default function Dashboard() {
 
     useEffect(() => {
         const fetchAutos = async () => {
-            const autosSnapshot = await getDocs(collection(db, "autos"));
-            const autosList = autosSnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            setAutos(autosList);
+            if (currentUser) {
+                // Filtrar autos por el UID del usuario autenticado
+                const q = query(collection(db, "autos"), where("userId", "==", currentUser.uid));
+                const autosSnapshot = await getDocs(q);
+                const autosList = autosSnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setAutos(autosList);
+            }
         };
 
         const fetchCotizaciones = async () => {
-            const cotizacionesSnapshot = await getDocs(
-                collection(db, "cotizaciones")
-            );
-            const cotizacionesList = cotizacionesSnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }));
-            setCotizaciones(cotizacionesList);
+            if (currentUser) {
+                // Filtrar cotizaciones por el UID del usuario autenticado
+                const q = query(collection(db, "cotizaciones"), where("userId", "==", currentUser.uid));
+                const cotizacionesSnapshot = await getDocs(q);
+                const cotizacionesList = cotizacionesSnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setCotizaciones(cotizacionesList);
+            }
         };
 
         fetchAutos();
         fetchCotizaciones();
-    }, []);
+    }, [currentUser]);
 
     // Autos: Guardar (Agregar o Editar)
     const handleAddOrEditAuto = async (e) => {
@@ -89,7 +99,11 @@ export default function Dashboard() {
                     "success"
                 );
             } else {
-                const newAutoRef = await addDoc(collection(db, "autos"), auto);
+                // Agregar el UID del usuario autenticado al crear un nuevo auto
+                const newAutoRef = await addDoc(collection(db, "autos"), {
+                    ...auto,
+                    userId: currentUser.uid, // Asociar el auto al usuario actual
+                });
                 setAutos([...autos, { id: newAutoRef.id, ...auto }]);
                 Swal.fire(
                     "Agregado",
@@ -170,10 +184,11 @@ export default function Dashboard() {
                     "success"
                 );
             } else {
-                const newCotizacionRef = await addDoc(
-                    collection(db, "cotizaciones"),
-                    cotizacion
-                );
+                // Agregar el UID del usuario autenticado al crear una nueva cotización
+                const newCotizacionRef = await addDoc(collection(db, "cotizaciones"), {
+                    ...cotizacion,
+                    userId: currentUser.uid, // Asociar la cotización al usuario actual
+                });
                 setCotizaciones([
                     ...cotizaciones,
                     { id: newCotizacionRef.id, ...cotizacion },

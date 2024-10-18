@@ -30,7 +30,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900 py-6 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md bg-black text-white shadow-xl rounded-lg">
+      <Card className="w-full max-w-md bg-black text-black shadow-xl rounded-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex items-center justify-center mb-4">
             <ShoppingBag className="h-12 w-12 text-yellow-500" />
@@ -44,26 +44,26 @@ export default function LoginForm() {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="email">Correo electrónico</Label>
-                <Input 
-                  id="email" 
-                  placeholder="tu@email.com" 
-                  type="email" 
-                  required 
-                  className="mt-1" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} // Maneja el cambio de email
+                <Label htmlFor="email" className="text-black">Correo electrónico</Label>
+                <Input
+                  id="email"
+                  placeholder="tu@email.com"
+                  type="email"
+                  required
+                  className="mt-1"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="password" className="text-black">Contraseña</Label>
                 <div className="relative mt-1">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     required
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} // Maneja el cambio de contraseña
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <Button
                     type="button"
@@ -80,16 +80,26 @@ export default function LoginForm() {
                   </Button>
                 </div>
               </div>
+
               {error && <p className="text-red-500 text-sm">{error}</p>} {/* Muestra el error si existe */}
               <Button className="w-full bg-yellow-500 hover:bg-yellow-600" type="submit">
                 Iniciar sesión
               </Button>
             </div>
           </form>
+
           <div className="mt-4 text-center text-sm text-gray-300">
             <Link to="/reset-password" className="text-yellow-500 hover:underline">
               ¿Olvidaste tu contraseña?
-            </Link> 
+            </Link>
+          </div>
+
+          <div className="mt-4 text-center text-sm text-black-300">
+            {/* Botón para ir a la página de registro */}
+            <span>¿No tienes una cuenta? </span>
+            <Link to="/register" className="text-yellow-500 hover:underline">
+              Regístrate
+            </Link>
           </div>
         </CardContent>
       </Card>

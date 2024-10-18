@@ -1,12 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../libs/firebase';
-import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail 
-} from 'firebase/auth';
+import {onAuthStateChanged, signInWithEmailAndPassword, signOut, 
+  createUserWithEmailAndPassword, sendPasswordResetEmail} from 'firebase/auth';
 import Swal from 'sweetalert2';
 
 // Crear AuthContext

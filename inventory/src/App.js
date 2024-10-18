@@ -12,6 +12,8 @@ import RedirectIfLoggedIn from './Context/RedirectIfLoggedIn'; // Componente par
 import CrearDueño from './Components/duenio/Crear_duenio';
 import CompleteAdminInfo from './Components/User/CompleteAdminInfo';
 import MisAutos from './Components/cliente/mis-autos'; // Ruta corregida
+import Register from './Components/register/register'; // Ruta al componente Register
+import ConfirmRegister from './Components/register/confirmRegister'; // Ruta para ConfirmRegister
 
 function App() {
   return (
@@ -36,6 +38,22 @@ function App() {
                 <ResetPasswordForm /> {/* Muestra Reset Password solo si no está autenticado */}
               </RedirectIfLoggedIn>
             }
+          />
+
+          {/* Ruta pública: Página de Registro */}
+          <Route
+            path="/register"
+            element={
+              <RedirectIfLoggedIn>
+                <Register /> {/* Muestra el formulario de Registro solo si no está autenticado */}
+              </RedirectIfLoggedIn>
+            }
+          />
+
+          {/* Ruta pública: Confirmación de Registro */}
+          <Route
+            path="/confirm-register"
+            element={<ConfirmRegister />}
           />
 
           {/* Ruta protegida: Dashboard */}

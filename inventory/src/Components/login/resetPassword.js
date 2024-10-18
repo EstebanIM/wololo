@@ -46,7 +46,7 @@ export default function ResetPasswordForm() {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="email">Correo electrónico</Label>
+                <Label htmlFor="email" className='text-black'>Correo electrónico</Label>
                 <Input
                   id="email"
                   placeholder="tu@email.com"
